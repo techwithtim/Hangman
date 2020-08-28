@@ -21,7 +21,7 @@ LIGHT_BLUE = (102,255,255)
 
 btn_font = pygame.font.SysFont("arial", 20)
 guess_font = pygame.font.SysFont("monospace", 24)
-lost_font = pygame.font.SysFont('arial', 45)
+lost_font = pygame.font.SysFont('arial', 30)
 word = ''
 buttons = []
 guessed = []
@@ -109,7 +109,11 @@ def end(winner=False):
         label = lost_font.render(lostTxt, 1, BLACK)
 
     wordTxt = lost_font.render(word.upper(), 1, BLACK)
-    wordWas = lost_font.render('The phrase was: ', 1, BLACK)
+
+    if " " not in word:
+        wordWas = lost_font.render('The word was: ', 1, BLACK)
+    else:
+        wordWas = lost_font.render('The phrase was: ', 1, BLACK)
 
     win.blit(wordTxt, (winWidth/2 - wordTxt.get_width()/2, 295))
     win.blit(wordWas, (winWidth/2 - wordWas.get_width()/2, 245))
@@ -143,6 +147,7 @@ def reset():
 # Setup buttons
 increase = round(winWidth / 13)
 for i in range(26):
+
     if i < 13:
         y = 40
         x = 25 + (increase * i)
