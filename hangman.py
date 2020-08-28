@@ -113,7 +113,7 @@ def end(winner=False):
     if " " not in word:
         wordWas = lost_font.render('The word was: ', 1, BLACK)
     else:
-        wordWas = lost_font.render('The word was: ', 1, BLACK)
+        wordWas = lost_font.render('The phrase was: ', 1, BLACK)
 
     win.blit(wordTxt, (winWidth/2 - wordTxt.get_width()/2, 295))
     win.blit(wordWas, (winWidth/2 - wordWas.get_width()/2, 245))
