@@ -143,6 +143,7 @@ def reset():
 # Setup buttons
 increase = round(winWidth / 13)
 for i in range(26):
+    
     if i < 13:
         y = 40
         x = 25 + (increase * i)
