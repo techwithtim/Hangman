@@ -9,3 +9,8 @@ hangman is cool
 zoologist
 quadruplets
 the sky is blue
+vet
+Architect
+the night is dark
+that was hard
+programming is cool
