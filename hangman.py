@@ -4,6 +4,16 @@
 #########################################################
 import pygame
 import random
+import sqlite3
+import datetime
+
+score=0 #점수
+cnt = 1 #id
+now=datetime.datetime.now() #현재 시점의 날짜
+nowDatetime=now.strftime("%Y-%m-%d %H:%M:%S")
+conn=sqlite3.connect("database.db")
+c=conn.cursor()
+c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMERY KEY,score INTEGER,regdate text)")
 
 pygame.init()
 winHeight = 480
@@ -34,7 +44,7 @@ def redraw_game_window():
     global guessed
     global hangmanPics
     global limbs
-    win.fill(GREEN)
+    win.fill(WHITE) #배경color
     # Buttons
     for i in range(len(buttons)):
         if buttons[i][4]:
@@ -94,26 +104,37 @@ def buttonHit(x, y):
                 return buttons[i][5]
     return None
 
-
 def end(winner=False):
     global limbs
+    global cnt
     lostTxt = 'You Lost, press any key to play again...'
     winTxt = 'WINNER!, press any key to play again...'
+
+    #DB insert
+    c.execute("INSERT INTO users (id, score, regdate) VALUES(?,?,?)", (cnt, score,nowDatetime))
+    conn.commit()
+    cnt+=1
+
     redraw_game_window()
     pygame.time.delay(1000)
-    win.fill(GREEN)
+    win.fill(WHITE) #end 배경 color
 
     if winner == True:
         label = lost_font.render(winTxt, 1, BLACK)
     else:
         label = lost_font.render(lostTxt, 1, BLACK)
 
+    topscore_user= " " #######수정해야함#######
+
     wordTxt = lost_font.render(word.upper(), 1, BLACK)
-    wordWas = lost_font.render('The phrase was: ', 1, BLACK)
+    wordWas = lost_font.render('The word was:', 1, BLACK)
+    topscore = lost_font.render("1st user : {}".format(topscore_user), 1, RED) #1등 score
 
     win.blit(wordTxt, (winWidth/2 - wordTxt.get_width()/2, 295))
     win.blit(wordWas, (winWidth/2 - wordWas.get_width()/2, 245))
     win.blit(label, (winWidth / 2 - label.get_width() / 2, 140))
+    win.blit(topscore, (winWidth / 2 - topscore.get_width() / 2, 80))
+
     pygame.display.update()
     again = True
     while again:
@@ -180,7 +201,12 @@ while inPlay:
                     print(spacedOut(word, guessed))
                     if spacedOut(word, guessed).count('_') == 0:
                         end(True)
+        if event.type == pygame.QUIT : #창이 닫히는 이벤트 발생하면
+            conn.execute("DELETE FROM users") #DB 데이터 삭제
+            conn.commit()
+            inPlay=False
 
+c.close()
 pygame.quit()
 
 # always quit pygame when done!
