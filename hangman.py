@@ -5,6 +5,9 @@
 import pygame
 import random
 
+#사운드 출력 필요 모듈
+import winsound
+
 pygame.init()
 winHeight = 480
 winWidth = 700
@@ -104,8 +107,10 @@ def end(winner=False):
     win.fill(GREEN)
 
     if winner == True:
+        winsound.PlaySound('./sound/pass.wav',winsound.SND_FILENAME)
         label = lost_font.render(winTxt, 1, BLACK)
     else:
+        winsound.PlaySound('./sound/nonpass.wav',winsound.SND_FILENAME)
         label = lost_font.render(lostTxt, 1, BLACK)
 
     wordTxt = lost_font.render(word.upper(), 1, BLACK)
@@ -166,6 +171,8 @@ while inPlay:
             if event.key == pygame.K_ESCAPE:
                 inPlay = False
         if event.type == pygame.MOUSEBUTTONDOWN:
+            ##버튼 클릭시 소리 재생
+            winsound.PlaySound('./sound/click.wav',winsound.SND_FILENAME)
             clickPos = pygame.mouse.get_pos()
             letter = buttonHit(clickPos[0], clickPos[1])
             if letter != None:
