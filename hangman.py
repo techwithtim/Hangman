@@ -279,11 +279,10 @@ while inPlay:
             if event.key == pygame.K_ESCAPE:
                 inPlay = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            ##버튼 클릭시 소리 재생
-            winsound.PlaySound('./sound/click.wav',winsound.SND_FILENAME)
             clickPos = pygame.mouse.get_pos()
             letter = buttonHit(clickPos[0], clickPos[1]) #마우스가 클릭한거
             if letter != None:
+                winsound.PlaySound('./sound/click.wav',winsound.SND_FILENAME) #버튼 클릭시 소리 재생
                 guessed.append(chr(letter))
                 buttons[letter - 65][4] = False
                 if hang(chr(letter)):
