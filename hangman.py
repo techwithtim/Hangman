@@ -44,27 +44,21 @@ background_1 = pygame.image.load("background/background.png")
 level_button = []
 limbs = 0
 
-total_time = 5 # 총시간
+total_time = 100 # 총시간
 start_ticks = pygame.time.get_ticks() #첫 시간
 
 def time() :
-    global elapsed_time
-    global Timer
+
     count = 0
 
     elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
     timer = btn_font.render(str(int(total_time-elapsed_time)),True,BLACK)
-    win.blit(timer,(50,200))
-
-    if count == 0:
-        if total_time - elapsed_time<=0:
-            end()
-            count +=1
-    else :
-        if total_time - (elapsed_time-resent_time)<=0:
-            end()
-
+    win.blit(timer,(285,135))
     pygame.display.update()
+
+    if total_time - elapsed_time<=0:
+        end()
+
 
 
 
@@ -239,7 +233,6 @@ def end(winner=False):
             if event.type == pygame.KEYDOWN:
                 again = False
     
-
     reset()
 
 
