@@ -19,6 +19,7 @@ pygame.init()
 winHeight = 480
 winWidth = 700
 win=pygame.display.set_mode((winWidth,winHeight))
+pygame.display.set_caption("hangman game") #화면 타이틀 설정
 #---------------------------------------#
 # initialize global variables/constants #
 #---------------------------------------#
@@ -45,6 +46,7 @@ def redraw_game_window():
     global hangmanPics
     global limbs
     win.fill(WHITE) #배경color
+    
     # Buttons
     for i in range(len(buttons)):
         if buttons[i][4]:
@@ -124,7 +126,12 @@ def end(winner=False):
     else:
         label = lost_font.render(lostTxt, 1, BLACK)
 
-    topscore_user= " " #######수정해야함#######
+    most_score=0
+    for row in c.execute("SELECT * FROM users"):
+        if row[1] > most_score: #가장 높은 점수 찾기
+            most_score=row[1]
+            most_score_date=row[2]
+        topscore_user=most_score
 
     wordTxt = lost_font.render(word.upper(), 1, BLACK)
     wordWas = lost_font.render('The word was:', 1, BLACK)
@@ -179,16 +186,17 @@ inPlay = True
 while inPlay:
     redraw_game_window()
     pygame.time.delay(10)
-
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT: #창이 닫히는 이벤트가 발생
+            conn.execute("DELETE FROM users") #DB 데이터 삭제
+            conn.commit()
             inPlay = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 inPlay = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             clickPos = pygame.mouse.get_pos()
-            letter = buttonHit(clickPos[0], clickPos[1])
+            letter = buttonHit(clickPos[0], clickPos[1]) #마우스가 클릭한거
             if letter != None:
                 guessed.append(chr(letter))
                 buttons[letter - 65][4] = False
@@ -201,12 +209,7 @@ while inPlay:
                     print(spacedOut(word, guessed))
                     if spacedOut(word, guessed).count('_') == 0:
                         end(True)
-        if event.type == pygame.QUIT : #창이 닫히는 이벤트 발생하면
-            conn.execute("DELETE FROM users") #DB 데이터 삭제
-            conn.commit()
-            inPlay=False
 
 c.close()
 pygame.quit()
-
 # always quit pygame when done!
