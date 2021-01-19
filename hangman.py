@@ -1,3 +1,7 @@
+
+# always quit pygame when done!
+
+
 #########################################################
 ## File Name: hangman.py                               ##
 ## Description: Starter for Hangman project - ICS3U    ##
@@ -49,7 +53,6 @@ total_time = 10 # 총 시간
 start_ticks = pygame.time.get_ticks() # 첫시간
 
 def time() :
-    count = 0
     elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
     timer = btn_font.render(str(int(total_time-elapsed_time)),True,BLACK)
     win.blit(timer,(285,135))
@@ -80,13 +83,11 @@ def redraw_game_window():
     label1 = guess_font.render(spaced, 1, BLACK) # _ _ _ _ _ <- 이 부분
     rect = label1.get_rect()
     length = rect[2]
-
+    
     win.blit(label1,(winWidth/2 - length/2, 400))
 
     pic = hangmanPics[limbs] #행맨그림
     win.blit(pic, (winWidth/2 - pic.get_width()/2 + 20, 150))
-
-
     pygame.display.update()
 
 
@@ -221,17 +222,12 @@ def end(winner=False):
 
     pygame.display.update()
     again = True
-
-   
-
     while again:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
                 again = False
-    
-
     reset()
 
 
@@ -240,14 +236,13 @@ def reset():
     global guessed
     global buttons
     global word
-
-    
     for i in range(len(buttons)):
         buttons[i][4] = True
+
+    limbs = 0
     guessed = []
     word = randomWord()
 
-    
 #MAINLINE
 
 
@@ -272,7 +267,6 @@ word = randomWord(w)#바뀜
 
 
 while inPlay:
- 
     redraw_game_window()
     pygame.time.delay(10)
     time()
