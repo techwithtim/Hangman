@@ -33,7 +33,7 @@ hangmanPics = [pygame.image.load('hangman0.png'), pygame.image.load('hangman1.pn
 limbs = 0
 
 total_time = 5 # 총시간
-#start_ticks = pygame.time.get_ticks() #첫 시간
+start_ticks = pygame.time.get_ticks() #첫 시간
 
 
 
@@ -165,15 +165,13 @@ def reset():
     global guessed
     global buttons
     global word
-    global start_ticks
+
     
     for i in range(len(buttons)):
         buttons[i][4] = True
     guessed = []
     word = randomWord()
 
-
-    start_ticks = pygame.time.get_ticks()
     
 #MAINLINE
 
@@ -195,13 +193,10 @@ inPlay = True
 
 while inPlay:
  
-
-   
     redraw_game_window()
     pygame.time.delay(10)
 
     time()
-
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
