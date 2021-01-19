@@ -25,7 +25,13 @@ lost_font = pygame.font.SysFont('arial', 45)
 word = ''
 buttons = []
 guessed = []
-hangmanPics = [pygame.image.load('hangman0.png'), pygame.image.load('hangman1.png'), pygame.image.load('hangman2.png'), pygame.image.load('hangman3.png'), pygame.image.load('hangman4.png'), pygame.image.load('hangman5.png'), pygame.image.load('hangman6.png')]
+hangmanPics = [
+    pygame.image.load('hangman0.png'), pygame.image.load('hangman1.png'), pygame.image.load('hangman2.png'), 
+    pygame.image.load('hangman3.png'), pygame.image.load('hangman4.png'), pygame.image.load('hangman5.png'), 
+    pygame.image.load('hangman6.png')
+]
+
+level_button = []
 
 limbs = 0
 
@@ -44,6 +50,8 @@ def redraw_game_window():
             label = btn_font.render(chr(buttons[i][5]), 1, BLACK)
             win.blit(label, (buttons[i][1] - (label.get_width() / 2), buttons[i][2] - (label.get_height() / 2)))
 
+
+
     spaced = spacedOut(word, guessed)
     label1 = guess_font.render(spaced, 1, BLACK)
     rect = label1.get_rect()
@@ -56,8 +64,55 @@ def redraw_game_window():
     pygame.display.update()
 
 
-def randomWord():
-    file = open('words.txt')
+    
+def level():#바뀜
+    win.fill(GREEN)
+    font = pygame.font.SysFont("monospace", 24)  #폰트 설정
+    text = font.render("level 1 -animal_easy",True, BLACK)  #텍스트가 표시된 Surface 를 만듬
+    win.blit(text,(200,100))
+    text = font.render("level 2 -animal_hard",True,BLACK)  #텍스트가 표시된 Surface 를 만듬
+    win.blit(text,(200,150))
+    text = font.render("level 3 -location_easy",True,BLACK)  #텍스트가 표시된 Surface 를 만듬
+    win.blit(text,(200,200))
+    text = font.render("level 4 -location_hard",True,BLACK)  #텍스트가 표시된 Surface 를 만듬
+    win.blit(text,(200,250))
+    text = font.render("level 5 -food_easy",True,BLACK)  #텍스트가 표시된 Surface 를 만듬
+    win.blit(text,(200,300))
+    text = font.render("level 6 -food_hard",True,BLACK)  #텍스트가 표시된 Surface 를 만듬
+    win.blit(text,(200,350))
+    pygame.display.update()
+    
+    play = True
+    while play:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                clickPos = pygame.mouse.get_pos()
+                x, y = clickPos
+                if y >= 80 and y <= 120:
+                    if x >= 150 and x <= 500:
+                        return 'animal_easy.txt'
+                if y >= 130 and y <= 170:
+                    if x >= 150 and x <= 500:
+                        return 'animal_hard.txt'
+                if y >= 180 and y <= 220:
+                    if x >= 150 and x <= 500:
+                        return 'location_easy.txt'
+                if y >= 230 and y <= 270:
+                    if x >= 150 and x <= 500:
+                        return 'location_hard.txt'
+                if y >= 280 and y <= 320:
+                    if x >= 150 and x <= 500:
+                        return 'food_easy.txt'
+                if y >= 330 and y <= 380:
+                    if x >= 150 and x <= 500:
+                        return 'food_hard.txt'
+    
+
+    
+    
+
+def randomWord(w):#바뀜
+    file = open(w)#바뀜
     f = file.readlines()
     i = random.randrange(0, len(f) - 1)
 
@@ -152,13 +207,18 @@ for i in range(26):
     buttons.append([LIGHT_BLUE, x, y, 20, True, 65 + i])
     # buttons.append([color, x_pos, y_pos, radius, visible, char])
 
-word = randomWord()
-inPlay = True
+
+inPlay = True#바뀜
+redraw_game_window()#바뀜
+pygame.time.delay(10)#바뀜
+w = level()#바뀜
+word = randomWord(w)#바뀜
+
 
 while inPlay:
     redraw_game_window()
     pygame.time.delay(10)
-
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             inPlay = False
