@@ -6,26 +6,26 @@ import pygame
 import random
 import sqlite3
 import datetime
+import winsound #사운드 출력 필요 모듈
+import time #타임 모듈
+import threading#쓰레드 모듈
+
+pygame.init()
 
 score=0 #점수
 cnt = 1 #id
 now=datetime.datetime.now() #현재 시점의 날짜
-nowDatetime=now.strftime("%Y-%m-%d %H:%M:%S")
-conn=sqlite3.connect("database.db")
-c=conn.cursor()
-c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMERY KEY,score INTEGER,regdate text)")
+nowDatetime=now.strftime("%Y-%m-%d %H:%M:%S") 
+conn=sqlite3.connect("database.db") #DB 연결
+c=conn.cursor() #커서 연결
+c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMERY KEY,score INTEGER,regdate text)") #DB 테이블 생성
 
-#사운드 출력 필요 모듈
-import winsound
-
-pygame.init()
-winHeight = 480
-winWidth = 700
+winHeight = 480 #창 세로 픽셀 길이
+winWidth = 700 #창 가로 픽셀 길이
 win=pygame.display.set_mode((winWidth,winHeight))
 pygame.display.set_caption("hangman game") #화면 타이틀 설정
-#---------------------------------------#
-# initialize global variables/constants #
-#---------------------------------------#
+
+##########colors##########
 BLACK = (0,0, 0)
 WHITE = (255,255,255)
 RED = (255,0, 0)
@@ -35,6 +35,7 @@ LIGHT_BLUE = (102,255,255)
 btn_font = pygame.font.SysFont('arial', 20) 
 guess_font = pygame.font.SysFont("monospace", 24)
 lost_font = pygame.font.SysFont('arial', 40)
+
 word = ''
 buttons = []
 guessed = [] 
@@ -42,6 +43,29 @@ hangmanPics = [pygame.image.load('hangman0.png'), pygame.image.load('hangman1.pn
 background_1 = pygame.image.load("background/background.png")
 level_button = []
 limbs = 0
+
+total_time = 5 # 총시간
+start_ticks = pygame.time.get_ticks() #첫 시간
+
+def time() :
+    global elapsed_time
+    global Timer
+    count = 0
+
+    elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
+    timer = btn_font.render(str(int(total_time-elapsed_time)),True,BLACK)
+    win.blit(timer,(50,200))
+
+    if count == 0:
+        if total_time - elapsed_time<=0:
+            end()
+            count +=1
+    else :
+        if total_time - (elapsed_time-resent_time)<=0:
+            end()
+
+    pygame.display.update()
+
 
 
 def redraw_game_window():
@@ -64,11 +88,13 @@ def redraw_game_window():
     label1 = guess_font.render(spaced, 1, BLACK) # _ _ _ _ _ <- 이 부분
     rect = label1.get_rect()
     length = rect[2]
-    
+
     win.blit(label1,(winWidth/2 - length/2, 400))
 
     pic = hangmanPics[limbs] #행맨그림
     win.blit(pic, (winWidth/2 - pic.get_width()/2 + 20, 150))
+
+
     pygame.display.update()
 
 
@@ -76,17 +102,17 @@ def redraw_game_window():
 def level():#바뀜
     win.fill(GREEN)
     font = pygame.font.SysFont("monospace", 24)  #폰트 설정
-    text = font.render("level 1 -animal_easy",True, BLACK)  #텍스트가 표시된 Surface 를 만듬
+    text = font.render("level 1 -animal_easy",True, BLACK)  #텍스트가 표시된 Surface 를 만듦
     win.blit(text,(200,100))
-    text = font.render("level 2 -animal_hard",True,BLACK)  #텍스트가 표시된 Surface 를 만듬
+    text = font.render("level 2 -animal_hard",True,BLACK)  #텍스트가 표시된 Surface 를 만듦
     win.blit(text,(200,150))
-    text = font.render("level 3 -location_easy",True,BLACK)  #텍스트가 표시된 Surface 를 만듬
+    text = font.render("level 3 -location_easy",True,BLACK)  #텍스트가 표시된 Surface 를 만듦
     win.blit(text,(200,200))
-    text = font.render("level 4 -location_hard",True,BLACK)  #텍스트가 표시된 Surface 를 만듬
+    text = font.render("level 4 -location_hard",True,BLACK)  #텍스트가 표시된 Surface 를 만듦
     win.blit(text,(200,250))
-    text = font.render("level 5 -food_easy",True,BLACK)  #텍스트가 표시된 Surface 를 만듬
+    text = font.render("level 5 -food_easy",True,BLACK)  #텍스트가 표시된 Surface 를 만듦
     win.blit(text,(200,300))
-    text = font.render("level 6 -food_hard",True,BLACK)  #텍스트가 표시된 Surface 를 만듬
+    text = font.render("level 6 -food_hard",True,BLACK)  #텍스트가 표시된 Surface 를 만듦
     win.blit(text,(200,350))
     pygame.display.update()
     
@@ -115,10 +141,6 @@ def level():#바뀜
                     if x >= 150 and x <= 500:
                         return 'food_hard.txt'
     
-
-    
-    
-
 def randomWord(w):#바뀜
     file = open(w)#바뀜
     f = file.readlines()
@@ -207,12 +229,17 @@ def end(winner=False):
 
     pygame.display.update()
     again = True
+
+   
+
     while again:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
                 again = False
+    
+
     reset()
 
 
@@ -221,13 +248,14 @@ def reset():
     global guessed
     global buttons
     global word
+
+    
     for i in range(len(buttons)):
         buttons[i][4] = True
-
-    limbs = 0
     guessed = []
     word = randomWord()
 
+    
 #MAINLINE
 
 
@@ -252,8 +280,10 @@ word = randomWord(w)#바뀜
 
 
 while inPlay:
+ 
     redraw_game_window()
     pygame.time.delay(10)
+    time()
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #창이 닫히는 이벤트가 발생
             conn.execute("DELETE FROM users") #DB 데이터 삭제
