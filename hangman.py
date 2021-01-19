@@ -1,15 +1,17 @@
+
+# always quit pygame when done!
+
+
 #########################################################
 ## File Name: hangman.py                               ##
 ## Description: Starter for Hangman project - ICS3U    ##
 #########################################################
 import pygame
 import random
-import time #타임 모듈
-import threading#쓰레드 모듈
-
+import time
+import threading
 
 pygame.init()
-
 winHeight = 480
 winWidth = 700
 win=pygame.display.set_mode((winWidth,winHeight))
@@ -30,6 +32,7 @@ word = ''
 buttons = []
 guessed = []
 hangmanPics = [pygame.image.load('hangman0.png'), pygame.image.load('hangman1.png'), pygame.image.load('hangman2.png'), pygame.image.load('hangman3.png'), pygame.image.load('hangman4.png'), pygame.image.load('hangman5.png'), pygame.image.load('hangman6.png')]
+
 limbs = 0
 
 total_time = 100 # 총시간
@@ -39,7 +42,6 @@ start_ticks = pygame.time.get_ticks() #첫 시간
 
 def time() :
 
-    count = 0
 
     elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
     timer = btn_font.render(str(int(total_time-elapsed_time)),True,BLACK)
@@ -70,13 +72,11 @@ def redraw_game_window():
     label1 = guess_font.render(spaced, 1, BLACK)
     rect = label1.get_rect()
     length = rect[2]
-
+    
     win.blit(label1,(winWidth/2 - length/2, 400))
 
     pic = hangmanPics[limbs]
     win.blit(pic, (winWidth/2 - pic.get_width()/2 + 20, 150))
-
-
     pygame.display.update()
 
 
@@ -140,16 +140,12 @@ def end(winner=False):
     win.blit(label, (winWidth / 2 - label.get_width() / 2, 140))
     pygame.display.update()
     again = True
-
-   
-
     while again:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
                 again = False
-    
     reset()
 
 
@@ -158,14 +154,13 @@ def reset():
     global guessed
     global buttons
     global word
-
-    
     for i in range(len(buttons)):
         buttons[i][4] = True
+
+    limbs = 0
     guessed = []
     word = randomWord()
 
-    
 #MAINLINE
 
 
@@ -185,10 +180,8 @@ word = randomWord()
 inPlay = True
 
 while inPlay:
- 
     redraw_game_window()
     pygame.time.delay(10)
-
     time()
 
     for event in pygame.event.get():
