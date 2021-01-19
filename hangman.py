@@ -27,43 +27,41 @@ BLACK = (0,0, 0)
 WHITE = (255,255,255)
 RED = (255,0, 0)
 GREEN = (0,255,0)
-BLUE = (0,0,255)
 LIGHT_BLUE = (102,255,255)
 
-btn_font = pygame.font.SysFont("arial", 20)
+btn_font = pygame.font.SysFont('arial', 20) 
 guess_font = pygame.font.SysFont("monospace", 24)
-lost_font = pygame.font.SysFont('arial', 45)
+lost_font = pygame.font.SysFont('arial', 40)
 word = ''
 buttons = []
-guessed = []
+guessed = [] 
 hangmanPics = [pygame.image.load('hangman0.png'), pygame.image.load('hangman1.png'), pygame.image.load('hangman2.png'), pygame.image.load('hangman3.png'), pygame.image.load('hangman4.png'), pygame.image.load('hangman5.png'), pygame.image.load('hangman6.png')]
-
+background_1 = pygame.image.load("background/background.png") 
 limbs = 0
 
 
 def redraw_game_window():
-    global guessed
+    global guessed #사용자가 입력하는 단어
     global hangmanPics
-    global limbs
+    global limbs # 행맨그림 index
     win.fill(WHITE) #배경color
     
     # Buttons
     for i in range(len(buttons)):
         if buttons[i][4]:
-            pygame.draw.circle(win, BLACK, (buttons[i][1], buttons[i][2]), buttons[i][3])
-            pygame.draw.circle(win, buttons[i][0], (buttons[i][1], buttons[i][2]), buttons[i][3] - 2
-                               )
-            label = btn_font.render(chr(buttons[i][5]), 1, BLACK)
+            pygame.draw.circle(win, BLACK, (buttons[i][1], buttons[i][2]), buttons[i][3]) #첫번째줄 버튼
+            pygame.draw.circle(win, buttons[i][0], (buttons[i][1], buttons[i][2]), buttons[i][3] - 2)  #두번째줄 버튼
+            label = btn_font.render(chr(buttons[i][5]), 1, BLACK) #버튼 글씨
             win.blit(label, (buttons[i][1] - (label.get_width() / 2), buttons[i][2] - (label.get_height() / 2)))
 
     spaced = spacedOut(word, guessed)
-    label1 = guess_font.render(spaced, 1, BLACK)
+    label1 = guess_font.render(spaced, 1, BLACK) # _ _ _ _ _ <- 이 부분
     rect = label1.get_rect()
     length = rect[2]
     
     win.blit(label1,(winWidth/2 - length/2, 400))
 
-    pic = hangmanPics[limbs]
+    pic = hangmanPics[limbs] #행맨그림
     win.blit(pic, (winWidth/2 - pic.get_width()/2 + 20, 150))
     pygame.display.update()
 
@@ -85,30 +83,33 @@ def hang(guess):
 
 
 def spacedOut(word, guessed=[]):
-    spacedWord = ''
-    guessedLetters = guessed
+    spacedWord = '' #화면에 표시되는 word
+    guessedLetters = guessed #사용자가 입력한 단어
     for x in range(len(word)):
         if word[x] != ' ':
-            spacedWord += '_ '
-            for i in range(len(guessedLetters)):
-                if word[x].upper() == guessedLetters[i]:
-                    spacedWord = spacedWord[:-2]
-                    spacedWord += word[x].upper() + ' '
+            spacedWord += '_ ' #정답 word 길이 만큼 '_'추가하기
+            for i in range(len(guessedLetters)): #사용자 입력 단어 알파벳 길이
+                if word[x].upper() == guessedLetters[i]: # 정답이랑 비교해서 같다면
+                    spacedWord = spacedWord[:-2] # '_'지우고
+                    spacedWord += word[x].upper() + ' ' # 알파벳 추가
         elif word[x] == ' ':
             spacedWord += ' '
     return spacedWord
             
 
-def buttonHit(x, y):
+def buttonHit(x, y): #버튼 눌렀을 때 그 위치에 해당하는 알파벳문자 return
     for i in range(len(buttons)):
         if x < buttons[i][1] + 20 and x > buttons[i][1] - 20:
             if y < buttons[i][2] + 20 and y > buttons[i][2] - 20:
                 return buttons[i][5]
     return None
 
+
 def end(winner=False):
     global limbs
     global cnt
+    global background_1
+
     lostTxt = 'You Lost, press any key to play again...'
     winTxt = 'WINNER!, press any key to play again...'
 
@@ -119,22 +120,29 @@ def end(winner=False):
 
     redraw_game_window()
     pygame.time.delay(1000)
-    win.fill(WHITE) #end 배경 color
+
+    TOPSCORE_TRUE=False
+    most_score=0
+
+    for row in c.execute("SELECT * FROM users"):
+        if row[1] > most_score: #가장 높은 점수 찾기
+            most_score=row[1]
+            most_score_date=row[2]
+            TOPSCORE_TRUE=True
+        topscore_user=most_score
+
+    if TOPSCORE_TRUE == True:
+        win.fill(GREEN)
+    else :
+        win.blit(background_1, (0, 0)) #end 배경 color
 
     if winner == True:
         label = lost_font.render(winTxt, 1, BLACK)
     else:
         label = lost_font.render(lostTxt, 1, BLACK)
 
-    most_score=0
-    for row in c.execute("SELECT * FROM users"):
-        if row[1] > most_score: #가장 높은 점수 찾기
-            most_score=row[1]
-            most_score_date=row[2]
-        topscore_user=most_score
-
     wordTxt = lost_font.render(word.upper(), 1, BLACK)
-    wordWas = lost_font.render('The word was:', 1, BLACK)
+    wordWas = lost_font.render('The word was :', 1, BLACK)
     topscore = lost_font.render("1st user : {}".format(topscore_user), 1, RED) #1등 score
 
     win.blit(wordTxt, (winWidth/2 - wordTxt.get_width()/2, 295))
@@ -153,7 +161,7 @@ def end(winner=False):
     reset()
 
 
-def reset():
+def reset(): 
     global limbs
     global guessed
     global buttons
@@ -177,7 +185,7 @@ for i in range(26):
     else:
         x = 25 + (increase * (i - 13))
         y = 85
-    buttons.append([LIGHT_BLUE, x, y, 20, True, 65 + i])
+    buttons.append([GREEN, x, y, 20, True, 65 + i])
     # buttons.append([color, x_pos, y_pos, radius, visible, char])
 
 word = randomWord()
