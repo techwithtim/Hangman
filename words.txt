@@ -1,5 +1,0 @@
-red
-yellow
-green
-blue
-black

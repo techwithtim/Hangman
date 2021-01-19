@@ -8,7 +8,7 @@ import sqlite3
 import datetime
 import winsound #사운드 출력 필요 모듈
 import time #타임 모듈
-import threading#쓰레드 모듈
+import threading #쓰레드 모듈
 
 pygame.init()
 
@@ -32,6 +32,7 @@ RED = (255,0, 0)
 GREEN = (0,255,0)
 LIGHT_BLUE = (102,255,255)
 
+##########fonts##########
 btn_font = pygame.font.SysFont('arial', 20) 
 guess_font = pygame.font.SysFont("monospace", 24)
 lost_font = pygame.font.SysFont('arial', 40)
@@ -39,23 +40,20 @@ lost_font = pygame.font.SysFont('arial', 40)
 word = ''
 buttons = []
 guessed = [] 
-hangmanPics = [pygame.image.load('hangman0.png'), pygame.image.load('hangman1.png'), pygame.image.load('hangman2.png'), pygame.image.load('hangman3.png'), pygame.image.load('hangman4.png'), pygame.image.load('hangman5.png'), pygame.image.load('hangman6.png')]
+hangmanPics = [pygame.image.load('hang_picture/hangman0.png'), pygame.image.load('hang_picture/hangman1.png'),pygame.image.load('hang_picture/hangman2.png'), pygame.image.load('hang_picture/hangman3.png'),pygame.image.load('hang_picture/hangman4.png'), pygame.image.load('hang_picture/hangman5.png'), pygame.image.load('hang_picture/hangman6.png')]
 background_1 = pygame.image.load("background/background.png")
 level_button = []
 limbs = 0
 
-total_time = 100 # 총시간
-start_ticks = pygame.time.get_ticks() #첫 시간
+total_time = 10 # 총 시간
+start_ticks = pygame.time.get_ticks() # 첫시간
 
 def time() :
-
     count = 0
-
     elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
     timer = btn_font.render(str(int(total_time-elapsed_time)),True,BLACK)
     win.blit(timer,(285,135))
     pygame.display.update()
-
     if total_time - elapsed_time<=0:
         end()
 
@@ -96,18 +94,18 @@ def redraw_game_window():
 def level():#바뀜
     win.fill(GREEN)
     font = pygame.font.SysFont("monospace", 24)  #폰트 설정
-    text = font.render("level 1 -animal_easy",True, BLACK)  #텍스트가 표시된 Surface 를 만듦
-    win.blit(text,(200,100))
-    text = font.render("level 2 -animal_hard",True,BLACK)  #텍스트가 표시된 Surface 를 만듦
-    win.blit(text,(200,150))
-    text = font.render("level 3 -location_easy",True,BLACK)  #텍스트가 표시된 Surface 를 만듦
-    win.blit(text,(200,200))
-    text = font.render("level 4 -location_hard",True,BLACK)  #텍스트가 표시된 Surface 를 만듦
-    win.blit(text,(200,250))
-    text = font.render("level 5 -food_easy",True,BLACK)  #텍스트가 표시된 Surface 를 만듦
-    win.blit(text,(200,300))
-    text = font.render("level 6 -food_hard",True,BLACK)  #텍스트가 표시된 Surface 를 만듦
-    win.blit(text,(200,350))
+    text = font.render("LEVEL 1 - animal(easy ver.)",True, BLACK)  #텍스트가 표시된 Surface를 만듦
+    win.blit(text,(160,100))
+    text = font.render("LEVEL 2 - animal(hard ver.)",True,BLACK)  #텍스트가 표시된 Surface를 만듦
+    win.blit(text,(160,150))
+    text = font.render("LEVEL 3 - location(easy ver.)",True,BLACK)  #텍스트가 표시된 Surface를 만듦
+    win.blit(text,(160,200))
+    text = font.render("LEVEL 4 - location(hard ver.)",True,BLACK)  #텍스트가 표시된 Surface를 만듦
+    win.blit(text,(160,250))
+    text = font.render("LEVEL 5 - food(easy ver.)",True,BLACK)  #텍스트가 표시된 Surface 를 만듦
+    win.blit(text,(160,300))
+    text = font.render("LEVEL 6 - food(hard ver.)",True,BLACK)  #텍스트가 표시된 Surface를 만듦
+    win.blit(text,(160,350))
     pygame.display.update()
     
     play = True
@@ -118,22 +116,22 @@ def level():#바뀜
                 x, y = clickPos
                 if y >= 80 and y <= 120:
                     if x >= 150 and x <= 500:
-                        return 'animal_easy.txt'
+                        return 'stage/animal_easy.txt'
                 if y >= 130 and y <= 170:
                     if x >= 150 and x <= 500:
-                        return 'animal_hard.txt'
+                        return 'stage/animal_hard.txt'
                 if y >= 180 and y <= 220:
                     if x >= 150 and x <= 500:
-                        return 'location_easy.txt'
+                        return 'stage/location_easy.txt'
                 if y >= 230 and y <= 270:
                     if x >= 150 and x <= 500:
-                        return 'location_hard.txt'
+                        return 'stage/location_hard.txt'
                 if y >= 280 and y <= 320:
                     if x >= 150 and x <= 500:
-                        return 'food_easy.txt'
+                        return 'stage/food_easy.txt'
                 if y >= 330 and y <= 380:
                     if x >= 150 and x <= 500:
-                        return 'food_hard.txt'
+                        return 'stage/food_hard.txt'
     
 def randomWord(w):#바뀜
     file = open(w)#바뀜
@@ -233,6 +231,7 @@ def end(winner=False):
             if event.type == pygame.KEYDOWN:
                 again = False
     
+
     reset()
 
 
