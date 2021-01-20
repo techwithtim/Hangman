@@ -1,14 +1,9 @@
-
-# always quit pygame when done!
-
-
 #########################################################
 ## File Name: hangman.py                               ##
 ## Description: Starter for Hangman project - ICS3U    ##
 #########################################################
 import pygame
 import random
-import time
 import threading
 
 pygame.init()
@@ -34,24 +29,6 @@ guessed = []
 hangmanPics = [pygame.image.load('hangman0.png'), pygame.image.load('hangman1.png'), pygame.image.load('hangman2.png'), pygame.image.load('hangman3.png'), pygame.image.load('hangman4.png'), pygame.image.load('hangman5.png'), pygame.image.load('hangman6.png')]
 
 limbs = 0
-
-total_time = 100 # 총시간
-start_ticks = pygame.time.get_ticks() #첫 시간
-
-
-
-def time() :
-
-
-    elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
-    timer = btn_font.render(str(int(total_time-elapsed_time)),True,BLACK)
-    win.blit(timer,(285,135))
-    pygame.display.update()
-
-    if total_time - elapsed_time<=0:
-        end()
-
-
 
 
 def redraw_game_window():
@@ -160,6 +137,7 @@ def reset():
     limbs = 0
     guessed = []
     word = randomWord()
+ 
 
 #MAINLINE
 
@@ -179,12 +157,44 @@ for i in range(26):
 word = randomWord()
 inPlay = True
 
+# timer
+count = 10
+parameter = 0
+def start_timer():
+    global count
+    global parameter
+    count-=1
+    print(count)
+    timer = threading.Timer(1,start_timer)
+    timer.start()
+    if parameter == 1026:
+        count = 10
+        parameter = 1
+    if count==0:
+        print("stop")
+        timer.cancel()
+        end(True)
+        
+
+    timer1 = btn_font.render(str(int(count)),True,BLACK)
+    win.blit(timer1,(285,135))
+    pygame.display.update()
+
+start_timer()
+
+
 while inPlay:
     redraw_game_window()
+    # st delay
     pygame.time.delay(10)
-    time()
+    
+    #1026
 
     for event in pygame.event.get():
+        # print("test:event mth")
+        if event.type == 1026:
+            parameter = 1026
+        
         if event.type == pygame.QUIT:
             inPlay = False
         if event.type == pygame.KEYDOWN:
@@ -207,5 +217,3 @@ while inPlay:
                         end(True)
 
 pygame.quit()
-
-# always quit pygame when done!
