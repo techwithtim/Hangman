@@ -45,30 +45,28 @@ word = ''
 buttons = []
 guessed = [] 
 hangmanPics = [pygame.image.load('hang_picture/hangman0.png'), pygame.image.load('hang_picture/hangman1.png'),pygame.image.load('hang_picture/hangman2.png'), pygame.image.load('hang_picture/hangman3.png'),pygame.image.load('hang_picture/hangman4.png'), pygame.image.load('hang_picture/hangman5.png'), pygame.image.load('hang_picture/hangman6.png')]
-background_1 = pygame.image.load("background/background.png")
+background_1 = pygame.image.load("background/background_1.png")
 level_button = []
 limbs = 0
 
 total_time = 10 # 총 시간
-start_ticks = pygame.time.get_ticks() # 첫시간
-
-def time() :
-    elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
-    timer = btn_font.render(str(int(total_time-elapsed_time)),True,BLACK)
-    win.blit(timer,(285,135))
-    pygame.display.update()
-    if total_time - elapsed_time<=0:
-        end()
-
-
-
+start_ticks = 0 # 첫 시간
 
 def redraw_game_window():
+
+    global start_ticks
     global guessed #사용자가 입력하는 단어
     global hangmanPics
     global limbs # 행맨그림 index
     win.fill(WHITE) #배경color
-    
+
+    #time
+    elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
+    timer = btn_font.render(str(int(total_time-elapsed_time)),True,BLACK)
+    win.blit(timer,(285,135))
+    if total_time - elapsed_time ==0 :
+        end()
+
     # Buttons
     for i in range(len(buttons)):
         if buttons[i][4]:
@@ -93,6 +91,8 @@ def redraw_game_window():
 
     
 def level():#바뀜
+    global start_ticks
+
     win.fill(GREEN)
     font = pygame.font.SysFont("monospace", 24)  #폰트 설정
     text = font.render("LEVEL 1 - animal(easy ver.)",True, BLACK)  #텍스트가 표시된 Surface를 만듦
@@ -113,6 +113,7 @@ def level():#바뀜
     while play:
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
+                start_ticks = pygame.time.get_ticks()
                 clickPos = pygame.mouse.get_pos()
                 x, y = clickPos
                 if y >= 80 and y <= 120:
@@ -269,7 +270,6 @@ word = randomWord(w)#바뀜
 while inPlay:
     redraw_game_window()
     pygame.time.delay(10)
-    time()
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #창이 닫히는 이벤트가 발생
             conn.execute("DELETE FROM users") #DB 데이터 삭제
