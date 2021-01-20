@@ -4,8 +4,7 @@
 #########################################################
 import pygame
 import random
-import threading
-
+import time
 pygame.init()
 winHeight = 480
 winWidth = 700
@@ -31,11 +30,32 @@ hangmanPics = [pygame.image.load('hangman0.png'), pygame.image.load('hangman1.pn
 limbs = 0
 
 
+total_time = 100 # 총시간
+
+
+
+def time() :
+
+
+    elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
+    timer = btn_font.render(str(int(total_time-elapsed_time)),True,BLACK)
+    win.blit(timer,(285,135))
+    pygame.display.update()
+
+    if total_time - elapsed_time<=0:
+        end()
+
+
+
+
+
 def redraw_game_window():
     global guessed
     global hangmanPics
     global limbs
     win.fill(GREEN)
+ 
+
     # Buttons
     for i in range(len(buttons)):
         if buttons[i][4]:
@@ -58,9 +78,12 @@ def redraw_game_window():
 
 
 def randomWord():
+    global start_ticks
     file = open('words.txt')
     f = file.readlines()
     i = random.randrange(0, len(f) - 1)
+    start_ticks = 0
+    start_ticks = pygame.time.get_ticks()
 
     return f[i][:-1]
 
@@ -131,13 +154,13 @@ def reset():
     global guessed
     global buttons
     global word
+
     for i in range(len(buttons)):
         buttons[i][4] = True
 
     limbs = 0
     guessed = []
     word = randomWord()
- 
 
 #MAINLINE
 
@@ -157,44 +180,16 @@ for i in range(26):
 word = randomWord()
 inPlay = True
 
-# timer
-count = 10
-parameter = 0
-def start_timer():
-    global count
-    global parameter
-    count-=1
-    print(count)
-    timer = threading.Timer(1,start_timer)
-    timer.start()
-    if parameter == 1026:
-        count = 10
-        parameter = 1
-    if count==0:
-        print("stop")
-        timer.cancel()
-        end(True)
-        
-
-    timer1 = btn_font.render(str(int(count)),True,BLACK)
-    win.blit(timer1,(285,135))
-    pygame.display.update()
-
-start_timer()
-
 
 while inPlay:
     redraw_game_window()
-    # st delay
     pygame.time.delay(10)
-    
-    #1026
+    global endd
+    time()
+
+
 
     for event in pygame.event.get():
-        # print("test:event mth")
-        if event.type == 1026:
-            parameter = 1026
-        
         if event.type == pygame.QUIT:
             inPlay = False
         if event.type == pygame.KEYDOWN:
