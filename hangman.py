@@ -12,13 +12,10 @@ import threading #쓰레드 모듈
 
 pygame.init()
 
-score=0 #점수
 cnt = 1 #id
-#now=datetime.now() #현재 시점의 날짜
-#nowDatetime=now.strftime("%Y-%m-%d %H:%M:%S") 
 conn=sqlite3.connect("database.db") #DB 연결
 c=conn.cursor() #커서 연결
-c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMERY KEY,score INTEGER,regdate text)") #DB 테이블 생성
+c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMERY KEY,score_time INTEGER)") #DB 테이블 생성
 
 winHeight = 480 #창 세로 픽셀 길이
 winWidth = 700 #창 가로 픽셀 길이
@@ -28,9 +25,8 @@ pygame.display.set_caption("hangman game") #화면 타이틀 설정
 ##########colors##########
 BLACK = (0,0, 0)
 WHITE = (255,255,255)
-RED = (255,0, 0)
-GREEN = (0,255,0)
-LIGHT_BLUE = (102,255,255)
+ORANGE = (255,127,39)
+YELLOW =(255,242,0)
 
 ##########fonts##########
 btn_font = pygame.font.SysFont('arial', 20) 
@@ -44,6 +40,7 @@ buttons = []
 guessed = [] 
 hangmanPics = [pygame.image.load('hang_picture/hangman0.png'), pygame.image.load('hang_picture/hangman1.png'),pygame.image.load('hang_picture/hangman2.png'), pygame.image.load('hang_picture/hangman3.png'),pygame.image.load('hang_picture/hangman4.png'), pygame.image.load('hang_picture/hangman5.png'), pygame.image.load('hang_picture/hangman6.png')]
 background_1 = pygame.image.load("background/background_1.png")
+background_2 = pygame.image.load("background/background_2.png")
 level_button = []
 limbs = 0
 time_out=[] # 시간 들어갈 리스트
@@ -85,7 +82,7 @@ def redraw_game_window():
     now_time = datetime.now()
     delta_time = (now_time-start).total_seconds()
     
-    timer = btn_font.render("time = {}".format(str(int(delta_time))),True,BLACK)
+    timer = btn_font.render("time : {}".format(str(int(delta_time))),True,BLACK)
     win.blit(timer,(10,450))
 
     # Buttons
@@ -203,46 +200,40 @@ def buttonHit(x, y): #버튼 눌렀을 때 그 위치에 해당하는 알파벳�
 def end(winner=False):
     global limbs
     global cnt
-    global background_1
 
     lostTxt = 'You Lost, press any key to play again...'
     winTxt = 'WINNER!, press any key to play again...'
 
-    #DB insert
-    c.execute("INSERT INTO users (id, score, regdate) VALUES(?,?,?)", (cnt, score, delta_time))
-    conn.commit()
-    cnt+=1
-
     redraw_game_window()
     pygame.time.delay(1000)
 
-    TOPSCORE_TRUE=False
-    most_score=0
-
-    #top_score = c.execute("SELECT MIN(regdate) FROM users")
-
-    for row in c.execute("SELECT * FROM users"):
-        if row[1] > most_score: #가장 높은 점수 찾기
-            most_score=row[1]
-            most_score_date=row[2]
-            TOPSCORE_TRUE=True
-        topscore_user=most_score
-
-    if TOPSCORE_TRUE == True:
-        win.fill(WHITE)
-    else :
-        win.blit(background_1, (0, 0)) #end 배경 color
-
     if winner == True:
+        win.blit(background_1,(0, 0))
         winsound.PlaySound('./sound/pass.wav',winsound.SND_FILENAME)
         label = lost_font.render(winTxt, 1, BLACK)
+         #DB insert
+        c.execute("INSERT INTO users (id, score_time) VALUES(?,?)", (cnt,int(delta_time)))
+        conn.commit()
+        cnt+=1
     else:
+        win.blit(background_2, (0, 0))
         winsound.PlaySound('./sound/nonpass.wav',winsound.SND_FILENAME)
         label = lost_font.render(lostTxt, 1, BLACK)
 
+    c.execute("SELECT * FROM users")
+
+    cf=c.fetchone()
+    most_score=cf[1]
+
+    for row in c.fetchall():
+        if row[1] <= most_score: # 가장 초가 작은 사람
+            most_score=row[1]
+    
+    topscore_user=most_score
+
     wordTxt = lost_font.render(word.upper(), 1, BLACK)
     wordWas = lost_font.render('The word was :', 1, BLACK)
-    topscore = lost_font.render("1st user : {}".format(topscore_user), 1, RED) #1등 score
+    topscore = lost_font.render("1st user : {}sec.".format(topscore_user), 1, ORANGE) #1등 score
 
     win.blit(wordTxt, (winWidth/2 - wordTxt.get_width()/2, 295))
     win.blit(wordWas, (winWidth/2 - wordWas.get_width()/2, 245))
@@ -286,7 +277,7 @@ for i in range(26):
     else:
         x = 25 + (increase * (i - 13))
         y = 85
-    buttons.append([GREEN, x, y, 20, True, 65 + i])
+    buttons.append([YELLOW, x, y, 20, True, 65 + i])
     # buttons.append([color, x_pos, y_pos, radius, visible, char])
 
 w = level()#바뀜
@@ -295,11 +286,8 @@ word = randomWord(w)#바뀜
 hintword = word.replace(' ', '')
 #공백제거한 단어의 알파벳 하나를 랜덤으로 추출
 a = random.choice(hintword)
-#간단하게는
-#a = random.choice(word)
-#t = a.upper()
-#도 가능하지만 이미 추측한 알파벳도 나옴
-#근데 아래 코드도 실행시 똑같이 추측한 알파벳도 나오기 때문에 똑같음.
+
+#힌트
 def Hint():
     global a
     while True:
