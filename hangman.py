@@ -210,7 +210,7 @@ def end(winner=False):
     winTxt = 'WINNER!, press any key to play again...'
 
     #DB insert
-    c.execute("INSERT INTO users (id, score, regdate) VALUES(?,?,?)", (cnt, score,int(delta_time)))
+    c.execute("INSERT INTO users (id, score, regdate) VALUES(?,?,?)", (cnt, score,delta_time))
     conn.commit()
     cnt+=1
 
