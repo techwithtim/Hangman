@@ -317,8 +317,8 @@ while inPlay:
     pygame.time.delay(10)
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #창이 닫히는 이벤트가 발생
-            # conn.execute("DELETE FROM users") #DB 데이터 삭제
-            # conn.commit()
+            conn.execute("DELETE FROM users") #DB 데이터 삭제
+            conn.commit()
             inPlay = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
