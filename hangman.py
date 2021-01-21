@@ -30,23 +30,11 @@ hangmanPics = [pygame.image.load('hangman0.png'), pygame.image.load('hangman1.pn
 limbs = 0
 
 
-total_time = 10 # 총시간
-
-
-
 def redraw_game_window():
     global guessed
     global hangmanPics
     global limbs
     win.fill(GREEN)
-
-    elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
-    timer = btn_font.render(str(int(total_time-elapsed_time)),True,BLACK)
-    win.blit(timer,(285,135))
-    pygame.display.update()
-
-    if total_time - elapsed_time<=0:
-        end()
  
 
     # Buttons
@@ -71,12 +59,12 @@ def redraw_game_window():
 
 
 def randomWord():
-    global start_ticks
+    global start
     file = open('words.txt')
     f = file.readlines()
     i = random.randrange(0, len(f) - 1)
-    start_ticks = 0
-    start_ticks = pygame.time.get_ticks()
+    start = 0
+    start = time.time()
 
     return f[i][:-1]
 
@@ -173,12 +161,12 @@ for i in range(26):
 word = randomWord()
 inPlay = True
 
+start = time.time()
 
 while inPlay:
     redraw_game_window()
     pygame.time.delay(10)
     global endd
-
 
 
 
@@ -198,10 +186,14 @@ while inPlay:
                     if limbs != 5:
                         limbs += 1
                     else:
+                        endd = time.time()
+                        print(int(endd-start))
                         end()
                 else:
                     print(spacedOut(word, guessed))
                     if spacedOut(word, guessed).count('_') == 0:
+                        endd = time.time()
+                        print(int(endd-start))
                         end(True)
 
 pygame.quit()
