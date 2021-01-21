@@ -4,7 +4,6 @@
 #########################################################
 import pygame
 import random
-from random import *
 import sqlite3
 import datetime
 import winsound #사운드 출력 필요 모듈
@@ -79,7 +78,7 @@ def redraw_game_window():
     global start_ticks
     #힌트버튼 변수 선언
     global hintb
-    win.fill(GREEN)
+    win.fill(WHITE)
     
     #time
     elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
@@ -116,7 +115,7 @@ def redraw_game_window():
 
     
 def level():#바뀜
-    win.fill(GREEN)
+    win.fill(WHITE)
     font = pygame.font.SysFont("monospace", 24)  #폰트 설정
     text = font.render("LEVEL 1 - animal(easy ver.)",True, BLACK)  #텍스트가 표시된 Surface를 만듦
     win.blit(text,(160,100))
@@ -161,7 +160,7 @@ def level():#바뀜
 def randomWord(w):#바뀜
     file = open(w)#바뀜
     f = file.readlines()
-    i = random.randrange(0, len(f) - 1)
+    i = random.randrange(0, len(f)-1)
     start_ticks = 0
     start_ticks = pygame.time.get_ticks()
 
@@ -226,7 +225,7 @@ def end(winner=False):
         topscore_user=most_score
 
     if TOPSCORE_TRUE == True:
-        win.fill(GREEN)
+        win.fill(WHITE)
     else :
         win.blit(background_1, (0, 0)) #end 배경 color
 
@@ -341,7 +340,7 @@ while inPlay:
                 #화면에 텍스트객체 출력
                 win.blit(text, (660,380))
                 #화면 업데이트
-                pygame.diplay.update()
+                pygame.display.update()
 
             if letter != None:
                 winsound.PlaySound('./sound/click.wav',winsound.SND_FILENAME) #버튼 클릭시 소리 재생
