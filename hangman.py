@@ -47,7 +47,7 @@ def redraw_game_window():
     
     timer = btn_font.render("time = {}".format(str(int(delta_time))),True,BLACK)
     win.blit(timer,(10,450))
-    pygame.display.update()
+
  
 
     # Buttons
