@@ -1,7 +1,0 @@
-dog
-cat
-mouse
-lion
-tiger
-elephant
-whale

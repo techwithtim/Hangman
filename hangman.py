@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #########################################################
 ## File Name: hangman.py                               ##
 ## Description: Starter for Hangman project - ICS3U    ##
@@ -6,20 +5,17 @@
 import pygame
 import random
 import sqlite3
-import datetime
+from datetime import datetime
 import winsound #사운드 출력 필요 모듈
 import time #타임 모듈
 import threading #쓰레드 모듈
 
 pygame.init()
 
-score=0 #점수
 cnt = 1 #id
-now=datetime.datetime.now() #현재 시점의 날짜
-nowDatetime=now.strftime("%Y-%m-%d %H:%M:%S") 
 conn=sqlite3.connect("database.db") #DB 연결
 c=conn.cursor() #커서 연결
-c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMERY KEY,score INTEGER,regdate text)") #DB 테이블 생성
+c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMERY KEY,score_time INTEGER)") #DB 테이블 생성
 
 winHeight = 480 #창 세로 픽셀 길이
 winWidth = 700 #창 가로 픽셀 길이
@@ -29,9 +25,8 @@ pygame.display.set_caption("hangman game") #화면 타이틀 설정
 ##########colors##########
 BLACK = (0,0, 0)
 WHITE = (255,255,255)
-RED = (255,0, 0)
-GREEN = (0,255,0)
-LIGHT_BLUE = (102,255,255)
+ORANGE = (255,127,39)
+YELLOW =(255,242,0)
 
 ##########fonts##########
 btn_font = pygame.font.SysFont('arial', 20) 
@@ -45,16 +40,16 @@ buttons = []
 guessed = [] 
 hangmanPics = [pygame.image.load('hang_picture/hangman0.png'), pygame.image.load('hang_picture/hangman1.png'),pygame.image.load('hang_picture/hangman2.png'), pygame.image.load('hang_picture/hangman3.png'),pygame.image.load('hang_picture/hangman4.png'), pygame.image.load('hang_picture/hangman5.png'), pygame.image.load('hang_picture/hangman6.png')]
 background_1 = pygame.image.load("background/background_1.png")
+background_2 = pygame.image.load("background/background_2.png")
 level_button = []
 limbs = 0
-
+time_out=[] # 시간 들어갈 리스트
 #힌트버튼사진
 hb = pygame.image.load('hint.png')
 #이미지크기변경
 hintb = pygame.transform.scale(hb, (50,50))
 
-total_time = 10 # 총시간
-start_ticks = 0
+
 
 #특정 범위 내의 좌표 마우스 클릭시 작동하는 클래스
 class hintbutton():
@@ -77,17 +72,18 @@ def redraw_game_window():
     global guessed
     global hangmanPics
     global limbs
-    global start_ticks
+    global start
     #힌트버튼 변수 선언
     global hintb
     win.fill(WHITE)
+    # 시간 함수
+    global delta_time
+
+    now_time = datetime.now()
+    delta_time = (now_time-start).total_seconds()
     
-    #time
-    elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
-    timer = btn_font.render("time : {}".format(str(int(total_time-elapsed_time))),True,BLACK)
+    timer = btn_font.render("time : {}".format(str(int(delta_time))),True,BLACK)
     win.blit(timer,(10,450))
-    if total_time - elapsed_time<=0:
-        end()
 
     # Buttons
     for i in range(len(buttons)):
@@ -160,11 +156,12 @@ def level():#바뀜
                         return 'stage/food_hard.txt'
     
 def randomWord(w):#바뀜
+    global start
     file = open(w)#바뀜
     f = file.readlines()
     i = random.randrange(0, len(f)-1)
-    start_ticks = 0
-    start_ticks = pygame.time.get_ticks()
+    start = 0
+    start = datetime.now() #스타트
 
     return f[i][:-1]
 
@@ -203,44 +200,40 @@ def buttonHit(x, y): #버튼 눌렀을 때 그 위치에 해당하는 알파벳�
 def end(winner=False):
     global limbs
     global cnt
-    global background_1
 
     lostTxt = 'You Lost, press any key to play again...'
     winTxt = 'WINNER!, press any key to play again...'
 
-    #DB insert
-    c.execute("INSERT INTO users (id, score, regdate) VALUES(?,?,?)", (cnt, score,nowDatetime))
-    conn.commit()
-    cnt+=1
-
     redraw_game_window()
     pygame.time.delay(1000)
 
-    TOPSCORE_TRUE=False
-    most_score=0
-
-    for row in c.execute("SELECT * FROM users"):
-        if row[1] > most_score: #가장 높은 점수 찾기
-            most_score=row[1]
-            most_score_date=row[2]
-            TOPSCORE_TRUE=True
-        topscore_user=most_score
-
-    if TOPSCORE_TRUE == True:
-        win.fill(WHITE)
-    else :
-        win.blit(background_1, (0, 0)) #end 배경 color
-
     if winner == True:
+        win.blit(background_1,(0, 0))
         winsound.PlaySound('./sound/pass.wav',winsound.SND_FILENAME)
         label = lost_font.render(winTxt, 1, BLACK)
+         #DB insert
+        c.execute("INSERT INTO users (id, score_time) VALUES(?,?)", (cnt,int(delta_time)))
+        conn.commit()
+        cnt+=1
     else:
+        win.blit(background_2, (0, 0))
         winsound.PlaySound('./sound/nonpass.wav',winsound.SND_FILENAME)
         label = lost_font.render(lostTxt, 1, BLACK)
 
+    c.execute("SELECT * FROM users")
+
+    cf=c.fetchone()
+    most_score=cf[1]
+
+    for row in c.fetchall():
+        if row[1] <= most_score: # 가장 초가 작은 사람
+            most_score=row[1]
+    
+    topscore_user=most_score
+
     wordTxt = lost_font.render(word.upper(), 1, BLACK)
     wordWas = lost_font.render('The word was :', 1, BLACK)
-    topscore = lost_font.render("1st user : {}".format(topscore_user), 1, RED) #1등 score
+    topscore = lost_font.render("1st user : {}".format(topscore_user), 1, ORANGE) #1등 score
 
     win.blit(wordTxt, (winWidth/2 - wordTxt.get_width()/2, 295))
     win.blit(wordWas, (winWidth/2 - wordWas.get_width()/2, 245))
@@ -269,7 +262,7 @@ def reset():
 
     limbs = 0
     guessed = []
-    word = randomWord()
+    word = randomWord(w)
 
 #MAINLINE
 
@@ -283,13 +276,9 @@ for i in range(26):
     else:
         x = 25 + (increase * (i - 13))
         y = 85
-    buttons.append([GREEN, x, y, 20, True, 65 + i])
+    buttons.append([YELLOW, x, y, 20, True, 65 + i])
     # buttons.append([color, x_pos, y_pos, radius, visible, char])
 
-
-inPlay = True#바뀜
-redraw_game_window()#바뀜
-pygame.time.delay(10)#바뀜
 w = level()#바뀜
 word = randomWord(w)#바뀜
 #랜덤한 단어의 공백을 제거
@@ -317,13 +306,19 @@ def Hint():
     return t
 
 
+inPlay = True#바뀜
+#redraw_game_window()#바뀜
+#pygame.time.delay(10)#바뀜
+
+
+
 while inPlay:
     redraw_game_window()
     pygame.time.delay(10)
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #창이 닫히는 이벤트가 발생
-            conn.execute("DELETE FROM users") #DB 데이터 삭제
-            conn.commit()
+            # conn.execute("DELETE FROM users") #DB 데이터 삭제
+            # conn.commit()
             inPlay = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -352,214 +347,6 @@ while inPlay:
                     if limbs != 5:
                         limbs += 1
                     else:
-                        end()
-                else:
-                    print(spacedOut(word, guessed))
-                    if spacedOut(word, guessed).count('_') == 0:
-                        end(True)
-
-c.close()
-pygame.quit()
-=======
-#########################################################
-## File Name: hangman.py                               ##
-## Description: Starter for Hangman project - ICS3U    ##
-#########################################################
-import pygame
-import random
-import time
-
-from datetime import datetime
-
-pygame.init()
-winHeight = 480
-winWidth = 700
-win=pygame.display.set_mode((winWidth,winHeight))
-#---------------------------------------#
-# initialize global variables/constants #
-#---------------------------------------#
-BLACK = (0,0, 0)
-WHITE = (255,255,255)
-RED = (255,0, 0)
-GREEN = (0,255,0)
-BLUE = (0,0,255)
-LIGHT_BLUE = (102,255,255)
-
-btn_font = pygame.font.SysFont("arial", 20)
-guess_font = pygame.font.SysFont("monospace", 24)
-lost_font = pygame.font.SysFont('arial', 45)
-word = ''
-buttons = []
-guessed = []
-time_out=[] # 시간 들어갈 리스트
-hangmanPics = [pygame.image.load('hangman0.png'), pygame.image.load('hangman1.png'), pygame.image.load('hangman2.png'), pygame.image.load('hangman3.png'), pygame.image.load('hangman4.png'), pygame.image.load('hangman5.png'), pygame.image.load('hangman6.png')]
-
-limbs = 0
-
-
-def redraw_game_window():
-    global guessed
-    global hangmanPics
-    global limbs
-    win.fill(GREEN)
-# 시간 함수
-    global delta_time
-
-    now_time = datetime.now()
-    delta_time = (now_time-start).total_seconds()
-    
-    timer = btn_font.render("time = {}".format(str(int(delta_time))),True,BLACK)
-    win.blit(timer,(10,450))
-    pygame.display.update()
- 
-
-    # Buttons
-    for i in range(len(buttons)):
-        if buttons[i][4]:
-            pygame.draw.circle(win, BLACK, (buttons[i][1], buttons[i][2]), buttons[i][3])
-            pygame.draw.circle(win, buttons[i][0], (buttons[i][1], buttons[i][2]), buttons[i][3] - 2
-                               )
-            label = btn_font.render(chr(buttons[i][5]), 1, BLACK)
-            win.blit(label, (buttons[i][1] - (label.get_width() / 2), buttons[i][2] - (label.get_height() / 2)))
-
-    spaced = spacedOut(word, guessed)
-    label1 = guess_font.render(spaced, 1, BLACK)
-    rect = label1.get_rect()
-    length = rect[2]
-    
-    win.blit(label1,(winWidth/2 - length/2, 400))
-
-    pic = hangmanPics[limbs]
-    win.blit(pic, (winWidth/2 - pic.get_width()/2 + 20, 150))
-    pygame.display.update()
-
-
-def randomWord():
-    global start
-    file = open('words.txt')
-    f = file.readlines()
-    i = random.randrange(0, len(f) - 1)
-    start = 0
-    start = datetime.now() #스타트
-
-    return f[i][:-1]
-
-
-def hang(guess):
-    global word
-    if guess.lower() not in word.lower():
-        return True
-    else:
-        return False
-
-
-def spacedOut(word, guessed=[]):
-    spacedWord = ''
-    guessedLetters = guessed
-    for x in range(len(word)):
-        if word[x] != ' ':
-            spacedWord += '_ '
-            for i in range(len(guessedLetters)):
-                if word[x].upper() == guessedLetters[i]:
-                    spacedWord = spacedWord[:-2]
-                    spacedWord += word[x].upper() + ' '
-        elif word[x] == ' ':
-            spacedWord += ' '
-    return spacedWord
-            
-
-def buttonHit(x, y):
-    for i in range(len(buttons)):
-        if x < buttons[i][1] + 20 and x > buttons[i][1] - 20:
-            if y < buttons[i][2] + 20 and y > buttons[i][2] - 20:
-                return buttons[i][5]
-    return None
-
-
-def end(winner=False):
-    global limbs
-    lostTxt = 'You Lost, press any key to play again...'
-    winTxt = 'WINNER!, press any key to play again...'
-    redraw_game_window()
-    pygame.time.delay(1000)
-    win.fill(GREEN)
-
-    if winner == True:
-        label = lost_font.render(winTxt, 1, BLACK)
-    else:
-        label = lost_font.render(lostTxt, 1, BLACK)
-
-    wordTxt = lost_font.render(word.upper(), 1, BLACK)
-    wordWas = lost_font.render('The phrase was: ', 1, BLACK)
-
-    win.blit(wordTxt, (winWidth/2 - wordTxt.get_width()/2, 295))
-    win.blit(wordWas, (winWidth/2 - wordWas.get_width()/2, 245))
-    win.blit(label, (winWidth / 2 - label.get_width() / 2, 140))
-    pygame.display.update()
-    again = True
-    while again:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-            if event.type == pygame.KEYDOWN:
-                again = False
-    reset()
-
-
-def reset():
-    global limbs
-    global guessed
-    global buttons
-    global word
-
-    for i in range(len(buttons)):
-        buttons[i][4] = True
-
-    limbs = 0
-    guessed = []
-    word = randomWord()
-
-#MAINLINE
-
-
-# Setup buttons
-increase = round(winWidth / 13)
-for i in range(26):
-    if i < 13:
-        y = 40
-        x = 25 + (increase * i)
-    else:
-        x = 25 + (increase * (i - 13))
-        y = 85
-    buttons.append([LIGHT_BLUE, x, y, 20, True, 65 + i])
-    # buttons.append([color, x_pos, y_pos, radius, visible, char])
-
-word = randomWord()
-inPlay = True
-
-
-
-while inPlay:
-    redraw_game_window()
-    pygame.time.delay(10)
-
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            inPlay = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                inPlay = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            clickPos = pygame.mouse.get_pos()
-            letter = buttonHit(clickPos[0], clickPos[1])
-            if letter != None:
-                guessed.append(chr(letter))
-                buttons[letter - 65][4] = False
-                if hang(chr(letter)):
-                    if limbs != 5:
-                        limbs += 1
-                    else:
                         time_out.append(delta_time) #리스트 시간 추가
                         end()
                 else:
@@ -568,5 +355,6 @@ while inPlay:
                         time_out.append(delta_time) # 끝날때 리스트에 흐른 시간 추가
                         end(True)
 
+
+c.close()
 pygame.quit()
->>>>>>> 6bfa10a07fdda96a555463c319bf2e76697e5656
