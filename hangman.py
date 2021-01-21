@@ -69,6 +69,7 @@ class hintbutton():
             if pos[1]>self.y and pos[1]<self.height:
                 return True
 
+#힌트버튼 생성
 hButton = hintbutton(640,415,690,465)
 
 def redraw_game_window():
