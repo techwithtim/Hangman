@@ -1,34 +1,5 @@
-#########################################################
-## File Name: hangman.py                               ##
-## Description: Starter for Hangman project - ICS3U    ##
-#########################################################
-import pygame
-import random
-import time
-
-from datetime import datetime
-
-pygame.init()
-winHeight = 480
-winWidth = 700
-win=pygame.display.set_mode((winWidth,winHeight))
-#---------------------------------------#
-# initialize global variables/constants #
-#---------------------------------------#
-BLACK = (0,0, 0)
-WHITE = (255,255,255)
-RED = (255,0, 0)
-GREEN = (0,255,0)
-BLUE = (0,0,255)
-LIGHT_BLUE = (102,255,255)
-
-btn_font = pygame.font.SysFont("arial", 20)
-guess_font = pygame.font.SysFont("monospace", 24)
-lost_font = pygame.font.SysFont('arial', 45)
-word = ''
 buttons = []
 guessed = []
-time_out=[] # 시간 들어갈 리스트
 hangmanPics = [pygame.image.load('hangman0.png'), pygame.image.load('hangman1.png'), pygame.image.load('hangman2.png'), pygame.image.load('hangman3.png'), pygame.image.load('hangman4.png'), pygame.image.load('hangman5.png'), pygame.image.load('hangman6.png')]
 
 limbs = 0
@@ -39,15 +10,6 @@ def redraw_game_window():
     global hangmanPics
     global limbs
     win.fill(GREEN)
-# 시간 함수
-    global delta_time
-
-    now_time = datetime.now()
-    delta_time = (now_time-start).total_seconds()
-    
-    timer = btn_font.render("time = {}".format(str(int(delta_time))),True,BLACK)
-    win.blit(timer,(10,450))
-
  
 
     # Buttons
@@ -77,7 +39,7 @@ def randomWord():
     f = file.readlines()
     i = random.randrange(0, len(f) - 1)
     start = 0
-    start = datetime.now() #스타트
+    start = time.time()
 
     return f[i][:-1]
 
@@ -174,11 +136,13 @@ for i in range(26):
 word = randomWord()
 inPlay = True
 
-
+start = time.time()
 
 while inPlay:
     redraw_game_window()
     pygame.time.delay(10)
+    global endd
+
 
 
     for event in pygame.event.get():
@@ -197,12 +161,14 @@ while inPlay:
                     if limbs != 5:
                         limbs += 1
                     else:
-                        time_out.append(delta_time) #리스트 시간 추가
+                        endd = time.time()
+                        print(int(endd-start))
                         end()
                 else:
                     print(spacedOut(word, guessed))
                     if spacedOut(word, guessed).count('_') == 0:
-                        time_out.append(delta_time) # 끝날때 리스트에 흐른 시간 추가
+                        endd = time.time()
+                        print(int(endd-start))
                         end(True)
 
 pygame.quit()
