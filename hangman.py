@@ -1,7 +1,3 @@
-
-# always quit pygame when done!
-
-
 #########################################################
 ## File Name: hangman.py                               ##
 ## Description: Starter for Hangman project - ICS3U    ##
@@ -49,22 +45,22 @@ background_1 = pygame.image.load("background/background_1.png")
 level_button = []
 limbs = 0
 
-total_time = 10 # 총 시간
-start_ticks = 0 # 첫 시간
+
+total_time = 10 # 총시간
+start_ticks = 0
 
 def redraw_game_window():
-
-    global start_ticks
-    global guessed #사용자가 입력하는 단어
+    global guessed
     global hangmanPics
-    global limbs # 행맨그림 index
-    win.fill(WHITE) #배경color
-
+    global limbs
+    global start_ticks
+    win.fill(GREEN)
+    
     #time
     elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
-    timer = btn_font.render(str(int(total_time-elapsed_time)),True,BLACK)
-    win.blit(timer,(285,135))
-    if total_time - elapsed_time ==0 :
+    timer = btn_font.render("time : {}".format(str(int(total_time-elapsed_time))),True,BLACK)
+    win.blit(timer,(10,450))
+    if total_time - elapsed_time<=0:
         end()
 
     # Buttons
@@ -91,8 +87,6 @@ def redraw_game_window():
 
     
 def level():#바뀜
-    global start_ticks
-
     win.fill(GREEN)
     font = pygame.font.SysFont("monospace", 24)  #폰트 설정
     text = font.render("LEVEL 1 - animal(easy ver.)",True, BLACK)  #텍스트가 표시된 Surface를 만듦
@@ -139,6 +133,8 @@ def randomWord(w):#바뀜
     file = open(w)#바뀜
     f = file.readlines()
     i = random.randrange(0, len(f) - 1)
+    start_ticks = 0
+    start_ticks = pygame.time.get_ticks()
 
     return f[i][:-1]
 
@@ -237,6 +233,7 @@ def reset():
     global guessed
     global buttons
     global word
+
     for i in range(len(buttons)):
         buttons[i][4] = True
 
@@ -265,6 +262,7 @@ redraw_game_window()#바뀜
 pygame.time.delay(10)#바뀜
 w = level()#바뀜
 word = randomWord(w)#바뀜
+
 
 
 while inPlay:
@@ -297,5 +295,3 @@ while inPlay:
 
 c.close()
 pygame.quit()
-
-# always quit pygame when done!
