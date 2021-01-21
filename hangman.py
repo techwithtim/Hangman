@@ -241,7 +241,7 @@ def reset():
 
     limbs = 0
     guessed = []
-    word = randomWord()
+    word = randomWord(w)
 
 #MAINLINE
 
