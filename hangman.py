@@ -33,28 +33,18 @@ limbs = 0
 total_time = 100 # 총시간
 
 
-
-def time() :
-
-
-    elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
-    timer = btn_font.render(str(int(total_time-elapsed_time)),True,BLACK)
-    win.blit(timer,(285,135))
-    pygame.display.update()
-
-    if total_time - elapsed_time<=0:
-        end()
-
-
-
-
-
 def redraw_game_window():
     global guessed
     global hangmanPics
     global limbs
     win.fill(GREEN)
- 
+    
+    #time
+    elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
+    timer = btn_font.render("time : {}".format(str(int(total_time-elapsed_time))),True,BLACK)
+    win.blit(timer,(10,450))
+    if total_time - elapsed_time<=0:
+        end()
 
     # Buttons
     for i in range(len(buttons)):
@@ -184,10 +174,6 @@ inPlay = True
 while inPlay:
     redraw_game_window()
     pygame.time.delay(10)
-    global endd
-    time()
-
-
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
