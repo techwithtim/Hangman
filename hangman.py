@@ -210,7 +210,7 @@ def end(winner=False):
     winTxt = 'WINNER!, press any key to play again...'
 
     #DB insert
-    c.execute("INSERT INTO users (id, score, regdate) VALUES(?,?,?)", (cnt, score,nowDatetime))
+    c.execute("INSERT INTO users (id, score, regdate) VALUES(?,?,?)", (cnt, score,int(delta_time)))
     conn.commit()
     cnt+=1
 
@@ -270,7 +270,7 @@ def reset():
 
     limbs = 0
     guessed = []
-    word = randomWord()
+    word = randomWord(w)
 
 #MAINLINE
 
