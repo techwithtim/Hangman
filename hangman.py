@@ -5,7 +5,7 @@
 import pygame
 import random
 import sqlite3
-import datetime
+from datetime import datetime
 import winsound #사운드 출력 필요 모듈
 import time #타임 모듈
 import threading #쓰레드 모듈
@@ -14,8 +14,8 @@ pygame.init()
 
 score=0 #점수
 cnt = 1 #id
-now=datetime.datetime.now() #현재 시점의 날짜
-nowDatetime=now.strftime("%Y-%m-%d %H:%M:%S") 
+#now=datetime.now() #현재 시점의 날짜
+#nowDatetime=now.strftime("%Y-%m-%d %H:%M:%S") 
 conn=sqlite3.connect("database.db") #DB 연결
 c=conn.cursor() #커서 연결
 c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMERY KEY,score INTEGER,regdate text)") #DB 테이블 생성
@@ -46,14 +46,13 @@ hangmanPics = [pygame.image.load('hang_picture/hangman0.png'), pygame.image.load
 background_1 = pygame.image.load("background/background_1.png")
 level_button = []
 limbs = 0
-
+time_out=[] # 시간 들어갈 리스트
 #힌트버튼사진
 hb = pygame.image.load('hint.png')
 #이미지크기변경
 hintb = pygame.transform.scale(hb, (50,50))
 
-total_time = 10 # 총시간
-start_ticks = 0
+
 
 #특정 범위 내의 좌표 마우스 클릭시 작동하는 클래스
 class hintbutton():
@@ -76,17 +75,19 @@ def redraw_game_window():
     global guessed
     global hangmanPics
     global limbs
-    global start_ticks
+    global start
     #힌트버튼 변수 선언
     global hintb
     win.fill(WHITE)
+    # 시간 함수
+    global delta_time
+
+    now_time = datetime.now()
+    delta_time = (now_time-start).total_seconds()
     
-    #time
-    elapsed_time = (pygame.time.get_ticks()-start_ticks)/1000
-    timer = btn_font.render("time : {}".format(str(int(total_time-elapsed_time))),True,BLACK)
+    timer = btn_font.render("time = {}".format(str(int(delta_time))),True,BLACK)
     win.blit(timer,(10,450))
-    if total_time - elapsed_time<=0:
-        end()
+    pygame.display.update()
 
     # Buttons
     for i in range(len(buttons)):
@@ -159,11 +160,12 @@ def level():#바뀜
                         return 'stage/food_hard.txt'
     
 def randomWord(w):#바뀜
+    global start
     file = open(w)#바뀜
     f = file.readlines()
     i = random.randrange(0, len(f)-1)
-    start_ticks = 0
-    start_ticks = pygame.time.get_ticks()
+    start = 0
+    start = datetime.now() #스타트
 
     return f[i][:-1]
 
@@ -285,10 +287,6 @@ for i in range(26):
     buttons.append([GREEN, x, y, 20, True, 65 + i])
     # buttons.append([color, x_pos, y_pos, radius, visible, char])
 
-
-inPlay = True#바뀜
-redraw_game_window()#바뀜
-pygame.time.delay(10)#바뀜
 w = level()#바뀜
 word = randomWord(w)#바뀜
 #랜덤한 단어의 공백을 제거
@@ -314,6 +312,12 @@ def Hint():
             #반복문 종료
             break
     return t
+
+
+inPlay = True#바뀜
+#redraw_game_window()#바뀜
+#pygame.time.delay(10)#바뀜
+
 
 
 while inPlay:
@@ -351,11 +355,14 @@ while inPlay:
                     if limbs != 5:
                         limbs += 1
                     else:
+                        time_out.append(delta_time) #리스트 시간 추가
                         end()
                 else:
                     print(spacedOut(word, guessed))
                     if spacedOut(word, guessed).count('_') == 0:
+                        time_out.append(delta_time) # 끝날때 리스트에 흐른 시간 추가
                         end(True)
+
 
 c.close()
 pygame.quit()
