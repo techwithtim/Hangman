@@ -191,23 +191,23 @@ word = randomWord()
 #랜덤한 단어의 공백을 제거
 hintword = word.replace(' ', '')
 #공백제거한 단어의 알파벳 하나를 랜덤으로 추출
-w = random.choice(hintword)
+a = random.choice(hintword)
 #간단하게는
 #w = random.choice(word)
 #t = w.upper()
 #도 가능하지만 이미 추측한 알파벳도 나옴..
 #근데 아래 코드도 실행시 똑같이 추측한 알파벳도 나오기 때문에.. 똑같다. 어차피 추측한 알파벳도 나오게 할거라면 위 코드 써도 될 듯.
 def Hint():
-    global w
+    global a
     while True:
         #변수w가 이미 추측한 알파벳이라면
-        if w in guessed:
+        if a in guessed:
             #변수w 다시 지정
-            w = random.choice(hintword)
+            a = random.choice(hintword)
         #아니라면
         else:
             #변수 t에 w를 대문자로 변환한 것 저장
-            t = w.upper()
+            t = a.upper()
             #반복문 종료
             break
     return t
