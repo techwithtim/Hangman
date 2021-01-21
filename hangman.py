@@ -209,7 +209,7 @@ def end(winner=False):
     winTxt = 'WINNER!, press any key to play again...'
 
     #DB insert
-    c.execute("INSERT INTO users (id, score, regdate) VALUES(?,?,?)", (cnt, score,delta_time))
+    c.execute("INSERT INTO users (id, score, regdate) VALUES(?,?,?)", (cnt, score, delta_time))
     conn.commit()
     cnt+=1
 
@@ -218,6 +218,8 @@ def end(winner=False):
 
     TOPSCORE_TRUE=False
     most_score=0
+
+    #top_score = c.execute("SELECT MIN(regdate) FROM users")
 
     for row in c.execute("SELECT * FROM users"):
         if row[1] > most_score: #가장 높은 점수 찾기
@@ -249,6 +251,7 @@ def end(winner=False):
 
     pygame.display.update()
     again = True
+
     while again:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -293,8 +296,8 @@ hintword = word.replace(' ', '')
 #공백제거한 단어의 알파벳 하나를 랜덤으로 추출
 a = random.choice(hintword)
 #간단하게는
-#w = random.choice(word)
-#t = w.upper()
+#a = random.choice(word)
+#t = a.upper()
 #도 가능하지만 이미 추측한 알파벳도 나옴
 #근데 아래 코드도 실행시 똑같이 추측한 알파벳도 나오기 때문에 똑같음.
 def Hint():
@@ -314,8 +317,6 @@ def Hint():
 
 
 inPlay = True#바뀜
-#redraw_game_window()#바뀜
-#pygame.time.delay(10)#바뀜
 
 
 
