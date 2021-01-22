@@ -1,0 +1,7 @@
+pasta
+soup
+apple
+banana
+orange
+melon
+carrot
