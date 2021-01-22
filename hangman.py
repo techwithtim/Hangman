@@ -307,7 +307,6 @@ def Hint():
 inPlay = True#바뀜
 
 
-
 while inPlay:
     redraw_game_window()
     pygame.time.delay(10)
