@@ -6,4 +6,4 @@ ports:
     onOpen: open-preview
 tasks:
   - init: pip3 install -r requirements.txt
-    command: python3 hangman.py
+    command: python3 __init__.py
