@@ -3,5 +3,5 @@ The mini-game was added to the existing Hangman game in the form of a consolatio
 # Requirements
 python 3
 pygame
-#Types of mini games
-Rock-Scissors-Paper game
+# Types of mini games
+1. Rock-Scissors-Paper game
