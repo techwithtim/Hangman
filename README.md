@@ -4,4 +4,4 @@ The mini-game was added to the existing Hangman game in the form of a consolatio
 python 3
 pygame
 # Types of mini games
-1. Rock-Scissors-Paper game
+1. Rock-Scissors-Paper game - kmurp62rulz
