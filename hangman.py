@@ -272,6 +272,8 @@ class RpsGame():
                         pc = self.pc_random_choice
                         
             pygame.display.flip()
+            if run == False:
+                sleep(1.5)
             clock.tick(30)
 
 
