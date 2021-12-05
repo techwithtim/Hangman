@@ -5,7 +5,7 @@
 import pygame
 import random
 from time import sleep
-
+from FlappyBird import main
 pygame.init()
 winHeight = 640
 winWidth = 960
@@ -328,7 +328,18 @@ while inPlay:
                                 limbs = 4
                             elif output == "lose":
                                 end()
-                        elif mini_game >= 1:
+                        elif mini_game == 1:
+                            mini_game += 1
+                            pygame.init()
+                            win = pygame.display.set_mode((288,512), pygame.SCALED)
+                            output = main.run_flappyBird()
+                            if output == "win":
+                                limbs = 4
+                            elif output == "lose":
+                                win = pygame.display.set_mode((960,640))
+                                end()
+                            win = pygame.display.set_mode((960, 640))
+                        elif mini_game >= 2:
                             end()
                 else:
                     print(spacedOut(word, guessed))
