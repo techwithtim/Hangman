@@ -275,11 +275,54 @@ class RpsGame():
             if run == False:
                 sleep(1.5)
             clock.tick(30)
-
-
+            
+            
         return output
-        pygame.init()         
+        pygame.init()
 
+
+def ReciveWord():
+	font = pygame.font.Font(None, 40)
+	font1 = pygame.font.Font(None, 50)
+	input_box = pygame.Rect(225, 350, 140, 40)
+	color_inactive = pygame.Color('lightskyblue3')
+	color_active = pygame.Color('dodgerblue2')
+	color = color_inactive
+	active = False
+	text = ''
+	subtext =''
+	done = False
+
+	while not done:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				done = True
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				if input_box.collidepoint(event.pos):
+					active = not active
+				else:
+					active = False
+				color = color_active if active else color_inactive
+			if event.type == pygame.KEYDOWN:
+				if active:
+					if event.key == pygame.K_RETURN:
+						return text
+					elif event.key == pygame.K_BACKSPACE:
+						text = text[:-1]
+					else:
+						text += event.unicode
+						subtext += '*'
+
+		win.fill((255, 255, 255))
+		txt = font1.render("Enter the word :",True,BLACK)
+		txt_surface = font.render(subtext, True, color)
+		width = max(200, txt_surface.get_width()+10)
+		input_box.w = width
+		win.blit(txt,(100,300))
+		win.blit(txt_surface, (input_box.x+5, input_box.y+5))
+		pygame.draw.rect(win, color, input_box, 2)
+
+		pygame.display.flip()
 
 #MAINLINE
 
@@ -296,7 +339,7 @@ for i in range(26):
     buttons.append([LIGHT_BLUE, x, y, 20, True, 65 + i])
     # buttons.append([color, x_pos, y_pos, radius, visible, char])
 
-word = randomWord()
+word = ReciveWord()
 inPlay = True
 mini_game = 0
 
